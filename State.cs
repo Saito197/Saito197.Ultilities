@@ -1,8 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SaitoGames.SmasherGame.Character
+namespace SaitoGames.Utilities
 {
+    public enum CharacterAction
+    {
+        // Define a list of input action/commands 
+    }
+
     public delegate void StateChangeEventHandler(Type newState);
 
     public abstract class State 

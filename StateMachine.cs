@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SaitoGames.SmasherGame.Character
+namespace SaitoGames.Utilities
 {
     public abstract class StateMachine : MonoBehaviour
     {
