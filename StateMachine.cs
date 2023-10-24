@@ -22,6 +22,18 @@ namespace SaitoGames.Utilities
             }
         }
 
+        public void ChangeState<T>() where T: State
+        {
+            // Handles when the current State requests a state change. 
+            var targetState = _states.FirstOrDefault(s => s is T);
+            if (targetState == null)
+                return;
+
+            _currentState.OnStateExit();
+            _currentState = targetState;
+            _currentState.OnStateEnter();
+        }
+
         protected void StateMachineInit(State initialState, List<State> states)
         {
             _currentState = initialState;
