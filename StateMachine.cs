@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SaitoGames.Utilities
@@ -7,54 +8,46 @@ namespace SaitoGames.Utilities
     public abstract class StateMachine : MonoBehaviour
     {
         protected State _currentState;
-        protected List<State> _states;
+        protected Dictionary<Type, State> _states;
+
+        public void ChangeState<T>() where T : State
+        {
+            // Handles when the current State requests a state change. 
+            var t = typeof(T);
+            if (_states.TryGetValue(t, out var targetState))
+            {
+                _currentState.OnStateExit();
+                _currentState = targetState;
+                _currentState.OnStateEnter();
+            }
+        }
 
         protected void StateMachineInit(State initialState, List<State> states)
         {
             _currentState = initialState;
-            _states = states;
+            _states = new Dictionary<Type, State>();
 
-            _currentState.StateChange += CheckForStateRequest;
+            foreach (var s in states)
+            {
+                var k = s.GetType();
+                _states.Add(k, s);
+            }
+
             _currentState.OnStateEnter();
         }
 
-        private void OnDestroy()
+        protected virtual void Update()
         {
-            if (_currentState != null ) 
-            { 
-                _currentState.StateChange -= CheckForStateRequest;
-            }
-        }
-
-        protected void Update()
-        {
-            if (_currentState == null)
-                return;
-
+            if (_currentState == null) return;
             _currentState.StateUpdate();
         }
 
-        protected void CheckForStateRequest(Type newState)
+        protected virtual void FixedUpdate()
         {
-            // Handles when the current State requests a state change. 
-            if (newState != typeof(State)) return;
-
-            foreach (var state in _states)
-            {
-                if (state.GetType() == newState)
-                {
-                    // Unregistering the old state and call exit function
-                    _currentState.StateChange -= CheckForStateRequest;
-                    _currentState.OnStateExit();
-
-                    // Registers the new state
-                    _currentState = state;
-                    _currentState.StateChange += CheckForStateRequest;
-                    _currentState.OnStateEnter();
-                    return;
-                }
-            }
-
+            if (_currentState == null) return;
+            _currentState.StateFixedUpdate();
         }
+
     }
+
 }
