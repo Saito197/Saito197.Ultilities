@@ -23,4 +23,23 @@ namespace SaitoGames.Utilities
         }
 
     }
+
+
+    public class GameEvent<T> : ScriptableObject
+    {
+        public delegate void EventHandler(T args);
+        public event EventHandler Response;
+        [SerializeField] private bool _logThisEvent;
+
+        public void Raise(T args)
+        {
+#if UNITY_EDITOR
+            if (_logThisEvent)
+                Debug.Log($"Event {name} raised");
+#endif
+
+            Response?.Invoke(args);
+        }
+
+    }
 }
